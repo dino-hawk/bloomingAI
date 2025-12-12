@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Meta Shang - AI生成的图片画廊">
+    <title>Meta Shang Gallery - Blooming AI</title>
+    <link rel="icon" type="image/png" href="images/Dino-Hawk_Circle.png">
+    <link rel="apple-touch-icon" href="images/Dino-Hawk_Circle.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>
+            <a href="index.html" style="color: inherit; text-decoration: none;">Blooming AI</a>
+        </h1>
+        <img src="images/Dino-Hawk_Circle.png" alt="Dino-Hawk Logo">
+    </header>
+
+    <div class="gallery-container">
+        <div class="gallery-bg" style="background-image: url('images/background/MetaShang_Background.jpg');">
+            <button class="nav-button prev" onclick="previousImages()">❮</button>
+
+            <div class="gallery-images" id="gallery">
+                <!-- 图片将通过 JavaScript 动态加载 -->
+            </div>
+
+            <button class="nav-button next" onclick="nextImages()">❯</button>
+        </div>
+    </div>
+
+    <script>
+        // 所有图片路径
+        const allImages = [
+            'images/MetaShang/20250304103740_9861.jpg',
+            'images/MetaShang/20250304102108_2750.jpg',
+            'images/MetaShang/20250115165034_5578.jpg',
+            'images/MetaShang/20250110201836_6621.jpg',
+            'images/MetaShang/20250106163041_5211.jpg',
+            'images/MetaShang/ComfyUI_temp_zkehy_00003_.jpg',
+            'images/MetaShang/ComfyUI_temp_zkehy_00004_.jpg',
+            'images/MetaShang/202411201606184144.jpg',
+            'images/MetaShang/202411221119063901.jpg',
+            'images/MetaShang/202412021122326864.jpg',
+            'images/MetaShang/202412021122294400.jpg',
+            'images/MetaShang/ComfyUI_temp_aouqb_00004_.jpg',
+            'images/MetaShang/202412031034356768.jpg',
+            'images/MetaShang/202412021734241800.jpg',
+            'images/MetaShang/202412021122359628.jpg',
+            'images/MetaShang/202412021117175199.jpg',
+            'images/MetaShang/202411261345444913.jpg',
+            'images/MetaShang/ComfyUI_temp_blgue_00119_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00111_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00073_.jpg',
+            'images/MetaShang/ComfyUI_temp_kodkn_00002_.jpg',
+            'images/MetaShang/ComfyUI_temp_hussi_00004_.jpg',
+            'images/MetaShang/ComfyUI_temp_fesrj_00008_.jpg',
+            'images/MetaShang/ComfyUI_temp_dtyzn_00030_.jpg',
+            'images/MetaShang/ComfyUI_temp_dtyzn_00006_.jpg',
+            'images/MetaShang/ComfyUI_temp_blgue_00126_.jpg',
+            'images/MetaShang/ComfyUI_temp_ybgte_00002_.jpg',
+            'images/MetaShang/ComfyUI_temp_xhryg_00044_.jpg',
+            'images/MetaShang/ComfyUI_temp_vxzbe_00007_.jpg',
+            'images/MetaShang/ComfyUI_temp_vlfmt_00001_.jpg',
+            'images/MetaShang/ComfyUI_temp_sepnv_00006_.jpg',
+            'images/MetaShang/ComfyUI_temp_njbbl_00115_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00344_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00317_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00307_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00300_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00281_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00263_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00234_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00227_.jpg',
+            'images/MetaShang/ComfyUI_temp_krjrc_00138_.jpg',
+            'images/MetaShang/未标题-1.jpg'
+        ];
+
+        // 洗牌算法
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // 打乱图片顺序
+        let shuffledImages = shuffleArray(allImages);
+        let currentIndex = 0;
+        let autoScrollTimer;
+
+        // 根据窗口宽度决定显示图片数量
+        function getImagesPerPage() {
+            const width = window.innerWidth;
+            if (width < 400) return 1;      // 极小屏：1张
+            if (width < 600) return 2;      // 手机：2张
+            if (width < 900) return 3;      // 平板：3张
+            if (width < 1400) return 4;     // 小屏：4张
+            return 5;                       // 大屏：5张
+        }
+
+        // 显示图片
+        function displayImages() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            const imagesPerPage = getImagesPerPage();
+
+            for (let i = 0; i < imagesPerPage; i++) {
+                const imgIndex = (currentIndex + i) % shuffledImages.length;
+                const imgPath = shuffledImages[imgIndex];
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'image-wrapper';
+
+                const img = document.createElement('img');
+                img.src = imgPath;
+                img.alt = `Meta Shang Image ${imgIndex + 1}`;
+                img.loading = 'lazy';
+
+                wrapper.appendChild(img);
+                gallery.appendChild(wrapper);
+            }
+        }
+
+        // 下一组图片
+        function nextImages() {
+            const imagesPerPage = getImagesPerPage();
+            currentIndex = (currentIndex + imagesPerPage) % shuffledImages.length;
+            displayImages();
+            resetAutoScroll();
+        }
+
+        // 上一组图片
+        function previousImages() {
+            const imagesPerPage = getImagesPerPage();
+            currentIndex = (currentIndex - imagesPerPage + shuffledImages.length) % shuffledImages.length;
+            displayImages();
+            resetAutoScroll();
+        }
+
+        // 自动滚动
+        function startAutoScroll() {
+            autoScrollTimer = setInterval(() => {
+                nextImages();
+            }, 10000); // 每10秒自动切换
+        }
+
+        // 重置自动滚动
+        function resetAutoScroll() {
+            clearInterval(autoScrollTimer);
+            startAutoScroll();
+        }
+
+        // 初始化
+        displayImages();
+        startAutoScroll();
+
+        // 窗口大小改变时重新显示
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                displayImages();
+            }, 200); // 防抖：200ms后才执行
+        });
+
+        // 键盘导航
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                previousImages();
+            } else if (e.key === 'ArrowRight') {
+                nextImages();
+            }
+        });
+    </script>
+</body>
+</html>
